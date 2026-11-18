@@ -1,38 +1,37 @@
-# NES TTGO VGA32 v1.03: bordas suavizadas (F5) + correções de CPU/IRQ
+# NES TTGO VGA32 v1.03 by André Chaves: Smoothed Edges (F5) + CPU/IRQ Fixes
 
-> v1.03: ver `ALTERACOES_v1.03_BORDAS_E_CPU.md` (bordas suavizadas nas 4 bordas sem recorte, IRQ por fonte, endereçamento indireto e opcodes não oficiais).
+> v1.03: See `ALTERACOES_v1.03_BORDAS_E_CPU.md` (smoothed edges on all 4 sides without cropping, source-based IRQ handling, indirect addressing, and unofficial opcodes).
 
+> v1.02: See `ALTERACOES_v1.02_CORRECOES_NUCLEO.md` (8 fixes to PPU, CPU, MMC3, and frame IRQ handling, with no performance overhead).
 
-> v1.02: ver `ALTERACOES_v1.02_CORRECOES_NUCLEO.md` (8 correções em PPU, CPU, MMC3 e IRQ de quadro, sem custo de desempenho).
+**Source:** The NES v1.00 ZIP file provided by the user. This v1.01 release only removes the artificial cropping previously used to hide overscan, while preserving the original project structure, menus, and all other features included in the source archive.
 
-**Origem:** o ZIP NES v1.00 enviado pelo usuário. Esta v1.01 remove apenas o recorte artificial usado para esconder o overscan, mantendo a estrutura do projeto, os menus e os demais recursos presentes no arquivo de origem.
+## v1.01 Changes
 
-## Alterações v1.01
+- `NES_VGA_OVERSCAN_SIDE=0`: Restores the **8 pixels on the left and 8 pixels on the right** that were previously replaced with black in centered mode or cropped by DMA in F4 mode.
+- `NES_VGA_OVERSCAN_BOTTOM=0`: Restores the **8 bottom rows** that were previously replaced with blanking in F4 mode.
+- F4 output returns to its original geometry of **256 active pixels / 344 samples per line** (default profile), with no DMA pointer offset and no changes to the NES image dimensions through cropping.
+- The FPS/EPS OSD returns to the beginning of the game area in F4 mode (x=1), since horizontal cropping is no longer applied.
+- All **240 NES scanlines** are displayed across the 480 VGA periods (2 VGA lines per NES scanline), with no artificial black bar at the bottom.
+- The margins in **320×240 centered mode** (32 pixels to the left and right of the game area) are natural margins of this mode and **are not** overscan masks. They remain unchanged.
 
-- `NES_VGA_OVERSCAN_SIDE=0`: restaura os **8 pixels da esquerda e 8 pixels da direita** anteriormente substituídos por preto no modo centralizado ou recortados pelo DMA no F4.
-- `NES_VGA_OVERSCAN_BOTTOM=0`: restaura as **8 linhas inferiores** anteriormente substituídas por blanking no F4.
-- A saída do F4 volta à geometria de **256 pixels ativos / 344 amostras por linha** (perfil padrão), sem deslocamento do ponteiro DMA e sem alteração do tamanho da imagem NES por recorte.
-- O OSD FPS/EPS volta ao início da área de jogo no F4 (x=1), porque o corte lateral não existe mais.
-- As **240 linhas NES** são apresentadas nos 480 períodos VGA (2 linhas por linha NES), sem faixa preta artificial no rodapé.
-- As margens do modo **320×240 centralizado** (32 pixels à esquerda e à direita do jogo) são margens naturais desse modo, e **não** são máscaras de overscan. Permanecem como antes.
+**Important:** Removing the cropping may reveal existing artifacts/tiles along the edges in some games. This change does not modify the PPU engine or fix any underlying scrolling artifacts; it simply stops hiding them.
 
-**Importante:** a eliminação do recorte permite voltar a ver artefatos/tiles existentes nas bordas de alguns jogos. Não altera o motor PPU nem corrige eventuais artefatos de rolagem na origem; somente deixa de escondê-los.
+## Build and Installation
 
-## Compilação e instalação
+1. Open this folder in **VS Code with PlatformIO**.
+2. Run **PlatformIO: Clean** followed by **PlatformIO: Build**.
+3. Flash the firmware using the previously approved **MultiLoader** procedure. The standard `Upload` command remains blocked to protect the *factory* partition.
+4. Continue using ROMs and the microSD card as before; the ZIP file does not include ROMs or binaries.
 
-1. Abrir esta pasta em **VS Code com PlatformIO**.
-2. Executar **PlatformIO: Clean** e **PlatformIO: Build**.
-3. Gravar pelo fluxo já aprovado do **MultiLoader**. O comando `Upload` padrão permanece bloqueado para preservar a partição *factory*.
-4. Continuar usando as ROMs e o microSD como antes; o ZIP não inclui ROMs ou binários.
+## Hardware Testing
 
-## Teste em hardware
+1. Start a game and verify that all 256 pixels are displayed, including both horizontal edges.
+2. Toggle F4 on/off: all 240 rows should remain visible, including the bottom 8 rows.
+3. Check that the FPS/EPS indicator displays all characters correctly and that the F1 menus still work.
+4. Test horizontal/diagonal scrolling in Double Dragon II and Castlevania II, confirming that content in the bottom corners is visible again.
+5. Verify FPS, EPS, audio, controls, ROM loading, savegames, and returning to MultiLoader.
 
-1. Iniciar um jogo e verificar os 256 pixels completos, incluindo as extremidades laterais.
-2. Alternar F4 ligado/desligado: todas as 240 linhas devem ficar visíveis, incluindo as 8 inferiores.
-3. Conferir que o indicador FPS/EPS não perdeu letras e os menus F1 continuam funcionando.
-4. Testar scroll horizontal/diagonal em Double Dragon II e Castlevania II e confirmar que o conteúdo do canto inferior voltou a aparecer.
-5. Verificar FPS, EPS, áudio, teclas, carregamento de ROM, savegames e saída para o MultiLoader.
+**Validation:** Geometry and configuration checks were performed on the host system. Xtensa/PlatformIO compilation and physical hardware testing were not performed in this environment.
 
-**Validação:** verificações de geometria e configuração feitas em host. Compilação Xtensa/PlatformIO e teste físico não foram realizados neste ambiente.
-
-O documento `AUDITORIA_GERAL_VIDEO_OVERSCAN_v1.00.md` é preservado como histórico da versão original com máscara. Veja `ALTERACOES_v1.01_SEM_MASCARAS.md` para o detalhamento desta alteração.
+The document `AUDITORIA_GERAL_VIDEO_OVERSCAN_v1.00.md` is preserved as a historical record of the original version with overscan masking. See `ALTERACOES_v1.01_SEM_MASCARAS.md` for details of this change.
